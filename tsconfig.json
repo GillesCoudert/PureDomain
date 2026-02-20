@@ -1,0 +1,13 @@
+{
+    "extends": "@tsconfig/node24/tsconfig.json",
+
+    "compilerOptions": {
+        "declaration": true,
+        "outDir": "./lib",
+        "removeComments": true,
+        "esModuleInterop": true,
+        "isolatedModules": true
+    },
+    "include": ["src/**/*", "tests/**/*"],
+    "exclude": ["node_modules", "lib"]
+}

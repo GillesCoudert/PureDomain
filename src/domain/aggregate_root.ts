@@ -3,6 +3,61 @@ import { pureZodParse, Success } from '@gilles-coudert/pure-trace';
 import { type z } from 'zod';
 import type { IdentifierExtractor, UpdateValidator } from './entity.js';
 
+//>
+//> > fr: Interface pour les instances d'agrégat créées par une factory.
+//> > en: Interface for aggregate root instances created by a factory.
+//>
+export interface PureAggregateRoot<
+    TSchema extends z.ZodObject<z.ZodRawShape>,
+    TId,
+    TEventClass = unknown,
+> {
+    /**
+     * The unique identifier of the aggregate.
+     */
+    readonly identifier: TId;
+
+    /**
+     * The underlying properties of the aggregate.
+     */
+    readonly properties: z.infer<TSchema>;
+
+    /**
+     * All uncommitted domain events.
+     */
+    readonly domainEvents: ReadonlyArray<TEventClass>;
+
+    /**
+     * Adds a domain event from this aggregate.
+     *
+     * @param event - The event to add
+     * @returns A new aggregate root instance with the event added
+     */
+    addEvent(event: TEventClass): PureAggregateRoot<TSchema, TId, TEventClass>;
+
+    /**
+     * Clears all domain events from this aggregate root.
+     *
+     * @returns A new aggregate root instance without events
+     */
+    clearEvents(): PureAggregateRoot<TSchema, TId, TEventClass>;
+
+    /**
+     * Compares this aggregate with another for equality based on ID.
+     *
+     * @param other - The aggregate to compare with
+     * @returns True if both aggregates have the same identifier
+     */
+    equals(other: PureAggregateRoot<TSchema, TId, TEventClass>): boolean;
+
+    /**
+     * Returns a string representation of the aggregate.
+     *
+     * @returns A string containing the aggregate root class name and identifier
+     */
+    toString(): string;
+}
+
 /**
  * Factory for creating Aggregate Root classes with validation, identity, and event management.
  *
@@ -73,7 +128,14 @@ export function createPureAggregateRoot<
     updateSchema?: TUpdateSchema,
     validateUpdate?: UpdateValidator<TSchema, TUpdateSchema>,
     identifierExtractor?: IdentifierExtractor<TSchema, TId>,
-) {
+): {
+    new (
+        properties: z.infer<TSchema>,
+    ): PureAggregateRoot<TSchema, TId, TEventClass>;
+    create(
+        data: z.infer<TSchema>,
+    ): Result<PureAggregateRoot<TSchema, TId, TEventClass>>;
+} {
     /**
      * Represents an Aggregate Root in Domain-Driven Design.
      * Aggregate Roots are entities that serve as the entry point to an aggregate
@@ -100,7 +162,7 @@ export function createPureAggregateRoot<
          */
         readonly domainEvents: ReadonlyArray<TEventClass>;
 
-        private constructor(
+        constructor(
             properties: z.infer<TSchema>,
             events: ReadonlyArray<TEventClass> = [],
         ) {
@@ -119,10 +181,18 @@ export function createPureAggregateRoot<
          * @param data - The data to create the aggregate from
          * @returns A Result containing the aggregate root or validation errors
          */
-        static create(data: z.infer<TSchema>): Result<AggregateRoot> {
+        static create(
+            data: z.infer<TSchema>,
+        ): Result<PureAggregateRoot<TSchema, TId, TEventClass>> {
             return pureZodParse(data, schema).mapSuccess(
                 (validatedData) =>
-                    new Success(new AggregateRoot(validatedData)),
+                    new Success(
+                        new AggregateRoot(validatedData) as PureAggregateRoot<
+                            TSchema,
+                            TId,
+                            TEventClass
+                        >,
+                    ),
             );
         }
 
@@ -152,7 +222,7 @@ export function createPureAggregateRoot<
             updates: TUpdateSchema extends z.ZodNever
                 ? never
                 : Partial<z.infer<TUpdateSchema>>,
-        ): Result<AggregateRoot> {
+        ): Result<PureAggregateRoot<TSchema, TId, TEventClass>> {
             const effectiveUpdateSchema =
                 updateSchema || (schema as unknown as TUpdateSchema);
 
@@ -179,7 +249,10 @@ export function createPureAggregateRoot<
                 .mapSuccess(
                     (validatedData) =>
                         new Success(
-                            new AggregateRoot(validatedData, this.domainEvents),
+                            new AggregateRoot(
+                                validatedData,
+                                this.domainEvents,
+                            ) as PureAggregateRoot<TSchema, TId, TEventClass>,
                         ),
                 );
         }
@@ -202,8 +275,12 @@ export function createPureAggregateRoot<
          *
          * @returns A new aggregate root instance without events
          */
-        clearEvents(): AggregateRoot {
-            return new AggregateRoot(this.properties, []);
+        clearEvents(): PureAggregateRoot<TSchema, TId, TEventClass> {
+            return new AggregateRoot(this.properties, []) as PureAggregateRoot<
+                TSchema,
+                TId,
+                TEventClass
+            >;
         }
 
         /**
@@ -212,8 +289,8 @@ export function createPureAggregateRoot<
          * @param other - The aggregate to compare with
          * @returns True if both aggregates have the same identifier
          */
-        equals(other: AggregateRoot): boolean {
-            return this.identifier === other.identifier;
+        equals(other: PureAggregateRoot<TSchema, TId, TEventClass>): boolean {
+            return this.identifier === (other as AggregateRoot).identifier;
         }
 
         /**
@@ -226,19 +303,3 @@ export function createPureAggregateRoot<
         }
     };
 }
-
-/**
- * Type helper to extract the Aggregate Root class type from a factory.
- */
-export type AggregateRoot<
-    TSchema extends z.ZodObject<z.ZodRawShape>,
-    TId,
-    TEventClass = unknown,
-> = ReturnType<
-    typeof createPureAggregateRoot<
-        TSchema,
-        z.ZodObject<z.ZodRawShape>,
-        TId,
-        TEventClass
-    >
->;

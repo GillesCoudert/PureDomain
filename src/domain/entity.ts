@@ -44,6 +44,37 @@ export type UpdateValidator<
     updates: z.infer<TUpdateSchema>,
 ) => Result<void>;
 
+//>
+//> > fr: Interface pour les instances d'entité créées par une factory.
+//> > en: Interface for entity instances created by a factory.
+//>
+export interface PureEntity<TSchema extends z.ZodObject<z.ZodRawShape>, TId> {
+    /**
+     * The unique identifier of the entity.
+     */
+    readonly identifier: TId;
+
+    /**
+     * The underlying properties of the entity.
+     */
+    readonly properties: z.infer<TSchema>;
+
+    /**
+     * Compares this entity with another for equality based on ID.
+     *
+     * @param other - The entity to compare with
+     * @returns True if both entities have the same identifier
+     */
+    equals(other: PureEntity<TSchema, TId>): boolean;
+
+    /**
+     * Returns a string representation of the entity.
+     *
+     * @returns A string containing the entity class name and identifier
+     */
+    toString(): string;
+}
+
 /**
  * Factory for creating Entity classes with validation and identity management.
  *
@@ -111,7 +142,10 @@ export function createPureEntity<
     updateSchema?: TUpdateSchema,
     validateUpdate?: UpdateValidator<TSchema, TUpdateSchema>,
     identifierExtractor?: IdentifierExtractor<TSchema, TId>,
-) {
+): {
+    new (properties: z.infer<TSchema>): PureEntity<TSchema, TId>;
+    create(data: z.infer<TSchema>): Result<PureEntity<TSchema, TId>>;
+} {
     /**
      * Represents an Entity in Domain-Driven Design.
      * Entities are identified by their unique ID rather than their properties.
@@ -147,9 +181,14 @@ export function createPureEntity<
          * @param data - The data to create the entity from
          * @returns A Result containing the entity or validation errors
          */
-        static create(data: z.infer<TSchema>): Result<Entity> {
+        static create(
+            data: z.infer<TSchema>,
+        ): Result<PureEntity<TSchema, TId>> {
             return pureZodParse(data, schema).mapSuccess(
-                (validatedData) => new Success(new Entity(validatedData)),
+                (validatedData) =>
+                    new Success(
+                        new Entity(validatedData) as PureEntity<TSchema, TId>,
+                    ),
             );
         }
 
@@ -178,7 +217,7 @@ export function createPureEntity<
             updates: TUpdateSchema extends z.ZodNever
                 ? never
                 : Partial<z.infer<TUpdateSchema>>,
-        ): Result<Entity> {
+        ): Result<PureEntity<TSchema, TId>> {
             const effectiveUpdateSchema =
                 updateSchema || (schema as unknown as TUpdateSchema);
 
@@ -203,7 +242,13 @@ export function createPureEntity<
                     return pureZodParse(mergedData, schema);
                 })
                 .mapSuccess(
-                    (validatedData) => new Success(new Entity(validatedData)),
+                    (validatedData) =>
+                        new Success(
+                            new Entity(validatedData) as PureEntity<
+                                TSchema,
+                                TId
+                            >,
+                        ),
                 );
         }
 
@@ -213,8 +258,8 @@ export function createPureEntity<
          * @param other - The entity to compare with
          * @returns True if both entities have the same identifier
          */
-        equals(other: Entity): boolean {
-            return this.identifier === other.identifier;
+        equals(other: PureEntity<TSchema, TId>): boolean {
+            return this.identifier === (other as Entity).identifier;
         }
 
         /**
@@ -227,13 +272,3 @@ export function createPureEntity<
         }
     };
 }
-
-/**
- * Type helper to extract the Entity class type from a factory.
- */
-export type Entity<
-    TSchema extends z.ZodObject<z.ZodRawShape>,
-    TId,
-> = ReturnType<
-    typeof createPureEntity<TSchema, z.ZodObject<z.ZodRawShape>, TId>
->;

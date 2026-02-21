@@ -1,7 +1,7 @@
 {
     "name": "@gilles-coudert/pure-domain",
     "version": "0.1.0",
-    "description": "TypeScript framework for building business domains following Domain-Driven Design (DDD) principles.",
+    "description": "TypeScript framework for building business domains following Domain-Driven Design (DDD) principles, using Zod schemas for entity and business rules declaration.",
     "private": false,
     "publishConfig": {
         "access": "public"
@@ -37,6 +37,7 @@
     "homepage": "https://github.com/GillesCoudert/PureDomain#readme",
     "devDependencies": {
         "@eslint/js": "^9.39.2",
+        "@gilles-coudert/pure-trace": "^0 || ^1",
         "@tsconfig/node24": "^24.0.4",
         "@types/jest": "^30.0.0",
         "@types/node": "^24.10.1",
@@ -52,10 +53,11 @@
         "prettier": "^3.8.1",
         "ts-jest": "^29.4.6",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.53.1"
+        "typescript-eslint": "^8.53.1",
+        "zod": "^4"
     },
-    "dependencies": {
-        "@gilles-coudert/pure-trace": "^1.0.11",
-        "zod": "^4.3.5"
+    "peerDependencies": {
+        "@gilles-coudert/pure-trace": "^0 || ^1",
+        "zod": "^4"
     }
 }

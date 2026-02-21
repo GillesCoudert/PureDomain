@@ -3,7 +3,9 @@ import { join } from 'path';
 import { z } from 'zod';
 import { createPureEntity, type PureEntity } from '../../src/domain/entity';
 
-const feature = loadFeature(join(__dirname, '../features/immutable_entity.feature'));
+const feature = loadFeature(
+    join(__dirname, '../features/immutable_entity.feature'),
+);
 
 //>
 //> > fr: Schéma utilisateur pour les tests d'entité immuable.

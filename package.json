@@ -1,7 +1,7 @@
 {
-    "name": "@gilles-coudert/pure-xxx",
-    "version": "0.0.3",
-    "description": "A TypeScript library XXX.",
+    "name": "@gilles-coudert/pure-domain",
+    "version": "0.1.0",
+    "description": "TypeScript framework for building business domains following Domain-Driven Design (DDD) principles.",
     "private": false,
     "publishConfig": {
         "access": "public"
@@ -17,20 +17,24 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/GillesCoudert/PureXXX.git"
+        "url": "git+https://github.com/GillesCoudert/PureDomain.git"
     },
     "keywords": [
         "PureFramework",
-        "PureXXX",
-        "Error Handling",
-        "Observability"
+        "DDD",
+        "Domain-Driven Design",
+        "Entities",
+        "Aggregate Roots",
+        "Value Objects",
+        "Domain Events",
+        "TypeScript"
     ],
     "author": "Gilles Coudert <pure.framework@gmail.com>",
     "license": "MPL-2.0",
     "bugs": {
-        "url": "https://github.com/GillesCoudert/PureXXX/issues"
+        "url": "https://github.com/GillesCoudert/PureDomain/issues"
     },
-    "homepage": "https://github.com/GillesCoudert/PureXXX#readme",
+    "homepage": "https://github.com/GillesCoudert/PureDomain#readme",
     "devDependencies": {
         "@eslint/js": "^9.39.2",
         "@tsconfig/node24": "^24.0.4",
@@ -51,6 +55,7 @@
         "typescript-eslint": "^8.53.1"
     },
     "dependencies": {
+        "@gilles-coudert/pure-trace": "^1.0.11",
         "zod": "^4.3.5"
     }
 }

@@ -15,107 +15,68 @@
 
 PureDomain is part of the **PureFramework** ecosystem:
 
+```mermaid
+graph TB
+    Domain[PureDomain - This Package]
+    Trace[PureTrace]
+    Zod[Zod]
+
+    Domain --> Trace
+    Domain --> Zod
+    Trace --> Zod
+
+    style Domain fill:#4a9eff,stroke:#2171d6,stroke-width:3px,color:#fff
+    style Trace fill:#e8f4ff,stroke:#4a9eff,stroke-width:2px
+    style Zod fill:#e8f4ff,stroke:#4a9eff,stroke-width:2px
 ```
-┌─────────────────────────────────────────┐
-│         Application Layer               │
-├─────────────────────────────────────────┤
-│         PureDomain (this package)       │
-│    - Entities & Aggregate Roots         │
-│    - Value Objects                      │
-│    - Domain Events                      │
-├─────────────────────────────────────────┤
-│         PureTrace (Error Handling)      │
-└─────────────────────────────────────────┘
+
+## Installation
+
+```bash
+npm install @gilles-coudert/pure-domain @gilles-coudert/pure-trace zod
 ```
 
 ## Quick Start
 
 ```typescript
-import {
-    createPureEntity,
-    createPureAggregateRoot,
-    createPureDomainEvent,
-} from '@gilles-coudert/pure-domain';
 import { z } from 'zod';
+import { createPureEntity } from '@gilles-coudert/pure-domain';
 
-// Define your schema
+// 1. Define your domain schema
 const UserSchema = z.object({
     id: z.string().uuid(),
     email: z.string().email(),
     name: z.string(),
 });
 
-// Create your entity
-const User = createPureEntity(UserSchema, (props) => props.id);
+// 2. Create an entity
+const User = createPureEntity(UserSchema);
 
-// Use it
+// 3. Use it
 const userResult = User.create({
     id: '550e8400-e29b-41d4-a716-446655440000',
-    email: 'user@example.com',
+    email: 'john@example.com',
     name: 'John Doe',
 });
 
-if (userResult.isSuccess) {
-    console.log('User created:', userResult.value.properties.name);
+// 4. Handle the result
+if (userResult.isSuccess()) {
+    const user = userResult.value;
+    console.log(`User created: ${user.properties.name}`);
+
+    // 5. Update immutably
+    const updatedResult = user.patch({ name: 'Jane Doe' });
+    if (updatedResult.isSuccess()) {
+        console.log(`Updated: ${updatedResult.value.properties.name}`);
+    }
 }
 ```
 
-## Core Concepts
+## Documentation
 
-### Entities
-
-Entities are domain objects distinguished by their unique identity rather than their properties.
-
-```typescript
-const Order = createPureEntity(OrderSchema, (props) => props.id);
-```
-
-### Aggregate Roots
-
-Aggregate Roots manage transactional consistency within aggregate boundaries and can emit domain events.
-
-```typescript
-const User = createPureAggregateRoot(UserSchema, (props) => props.id);
-```
-
-### Value Objects
-
-Value Objects are immutable domain objects identified by their properties.
-
-```typescript
-const Money = createPureValueObject(MoneySchema);
-```
-
-### Domain Events
-
-Model important business events that occur within your domain.
-
-```typescript
-const UserCreated = createPureDomainEvent({
-    name: 'UserCreated',
-    schema: z.object({
-        userId: z.string(),
-        email: z.string(),
-    }),
-});
-```
-
-### Capabilities
-
-Use capability interfaces to describe optional domain features:
-
-```typescript
-import type { HasOwnership } from '@gilles-coudert/pure-domain';
-
-interface AdminUser extends HasOwnership {
-    // ...
-}
-```
-
-## Advanced documentation
-
-- [Best practices](docs/best_practices.md)
-- [Examples](docs/examples.md)
+- [API Reference](docs/api.md) - Complete API documentation
+- [Best Practices](docs/best_practices.md) - Development guide for humans and AI agents
+- [Examples](docs/examples.md) - Practical examples following best practices
 
 ## Contributing
 
@@ -146,5 +107,3 @@ This project is licensed under the **Mozilla Public License 2.0 (MPL-2.0)**.
 
 - Email: [pure.framework@gmail.com](mailto:pure.framework@gmail.com)
 - GitHub: [https://github.com/GillesCoudert](https://github.com/GillesCoudert)
-
-## Links

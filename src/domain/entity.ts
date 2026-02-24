@@ -30,7 +30,10 @@ export type IdentifierExtractor<
  *     updates: OrderUpdateProperties,
  * ): Result<void> => {
  *     if (updates.status === 'shipped' && current.status !== 'confirmed') {
- *         return generateFailure('cannotShipUnconfirmedOrder');
+ *         return generateFailure({
+ *             type: 'processError',
+ *             code: 'cannotShipUnconfirmedOrder'
+ *         });
  *     }
  *     return new Success(undefined);
  * };
@@ -117,7 +120,10 @@ export interface PureEntity<TSchema extends z.ZodObject<z.ZodRawShape>, TId> {
  *     OrderUpdateSchema,
  *     (current, updates) => {
  *         if (updates.status === 'shipped' && current.status !== 'confirmed') {
- *             return generateFailure('cannotShipUnconfirmedOrder');
+ *             return generateFailure({
+ *                 type: 'processError',
+ *                 code: 'cannotShipUnconfirmedOrder'
+ *             });
  *         }
  *         return new Success(undefined);
  *     }

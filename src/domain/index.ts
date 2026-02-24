@@ -10,9 +10,17 @@
 //> > en: Value Objects
 //>
 export type { PureValueObject } from './value_object.js';
+export { createPureValueObject } from './value_object.js';
+
+//>
+//> > fr: Entities
 //> > en: Entities
 //>
-export type { PureEntity, IdentifierExtractor } from './entity.js';
+export type {
+    PureEntity,
+    IdentifierExtractor,
+    UpdateValidator,
+} from './entity.js';
 export { createPureEntity } from './entity.js';
 
 //>
@@ -20,6 +28,10 @@ export { createPureEntity } from './entity.js';
 //> > en: Aggregate Roots
 //>
 export type { PureAggregateRoot } from './aggregate_root.js';
+export { createPureAggregateRoot } from './aggregate_root.js';
+
+//>
+//> > fr: Domain Events
 //> > en: Domain Events
 //>
 export type { DomainEvent } from './domain_event.js';

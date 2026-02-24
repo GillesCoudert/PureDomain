@@ -1,13 +1,14 @@
 {
     "name": "@gilles-coudert/pure-domain",
-    "version": "0.1.0",
+    "version": "0.0.0",
     "description": "TypeScript framework for building business domains following Domain-Driven Design (DDD) principles, using Zod schemas for entity and business rules declaration.",
     "private": false,
     "publishConfig": {
         "access": "public"
     },
     "files": [
-        "lib"
+        "lib",
+        "docs"
     ],
     "scripts": {
         "prebuild": "node -e \"require('fs').rmSync('lib', { recursive: true, force: true })\"",
@@ -36,25 +37,25 @@
     },
     "homepage": "https://github.com/GillesCoudert/PureDomain#readme",
     "devDependencies": {
-        "@eslint/js": "^9.39.2",
-        "@gilles-coudert/pure-trace": "^0 || ^1",
+        "@eslint/js": "^10.0.1",
+        "@gilles-coudert/pure-trace": "^1.0.13",
         "@tsconfig/node24": "^24.0.4",
         "@types/jest": "^30.0.0",
-        "@types/node": "^24.10.1",
-        "@typescript-eslint/eslint-plugin": "^8.53.1",
-        "@typescript-eslint/parser": "^8.53.1",
-        "eslint": "^9.39.2",
+        "@types/node": "^25.3.0",
+        "@typescript-eslint/eslint-plugin": "^8.56.1",
+        "@typescript-eslint/parser": "^8.56.1",
+        "eslint": "^10.0.2",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.5",
-        "globals": "^17.0.0",
+        "globals": "^17.3.0",
         "jest": "^30.2.0",
         "jest-cucumber": "^4.5.0",
         "jiti": "^2.6.1",
         "prettier": "^3.8.1",
         "ts-jest": "^29.4.6",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.53.1",
-        "zod": "^4"
+        "typescript-eslint": "^8.56.1",
+        "zod": "^4.3.6"
     },
     "peerDependencies": {
         "@gilles-coudert/pure-trace": "^0 || ^1",

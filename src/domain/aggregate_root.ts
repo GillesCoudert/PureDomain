@@ -102,7 +102,10 @@ export interface PureAggregateRoot<
  *     OrderUpdateSchema,
  *     (current, updates) => {
  *         if (updates.status === 'shipped' && current.status !== 'confirmed') {
- *             return generateFailure('cannotShipUnconfirmedOrder');
+ *             return generateFailure({
+ *                 type: 'processError',
+ *                 code: 'cannotShipUnconfirmedOrder'
+ *             });
  *         }
  *         return new Success(undefined);
  *     }
